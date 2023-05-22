@@ -1,0 +1,194 @@
+CREATE DATABASE e_commerce;
+use e_commerce;
+ 
+ CREATE TABLE SUPPLIER(
+     SUPP_ID INT unsigned PRIMARY KEY auto_increment, 
+     SUPP_NAME VARCHAR(50) NOT NULL, 
+     SUPP_CITY VARCHAR(50) NOT NULL, 
+     SUPP_PHONE VARCHAR(50) NOT NULL
+  );
+  
+  CREATE TABLE CUSTOMER(CUST_ID INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+		CUST_NAME VARCHAR(20) NOT NULL,
+		CUST_PHONE VARCHAR(10) NOT NULL, 
+		CUST_CITY VARCHAR(30) NOT NULL,
+		CUST_GENDER ENUM("M","F") NOT NULL
+  );
+  
+CREATE TABLE CATEGORY(CAT_ID INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+		CAT_NAME VARCHAR(20) NOT NULL);
+        
+CREATE TABLE PRODUCT(PRO_ID INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, 
+       PRO_NAME VARCHAR(20) NOT NULL, 
+       PRO_DESC VARCHAR(60), 
+       CAT_ID INT UNSIGNED, 
+       FOREIGN KEY(CAT_ID) REFERENCES CATEGORY(CAT_ID));
+
+CREATE TABLE SUPPLIER_PRICING(PRICING_ID INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, 
+       PRO_ID INT UNSIGNED, 
+       FOREIGN KEY(PRO_ID) REFERENCES PRODUCT(PRO_ID), 
+       SUPP_ID INT UNSIGNED, 
+       FOREIGN KEY(SUPP_ID) REFERENCES SUPPLIER(SUPP_ID), 
+       SUPP_PRICE INT UNSIGNED DEFAULT 0);
+
+CREATE TABLE ORDERS(ORD_ID INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, 
+        ORD_AMOUNT INT UNSIGNED NOT NULL, 
+        ORD_DATE DATE NOT NULL,
+        CUST_ID INT UNSIGNED, 
+        FOREIGN KEY(CUST_ID) REFERENCES CUSTOMER(CUST_ID), 
+        PRICING_ID INT UNSIGNED,
+        FOREIGN KEY(PRICING_ID) REFERENCES supplier_pricing(PRICING_ID));
+
+
+CREATE TABLE RATING(RAT_ID INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, 
+        ORD_ID INT UNSIGNED, 
+        FOREIGN KEY(ORD_ID) REFERENCES ORDERS(ORD_ID), 
+        RAT_RATSTARTS INT NOT NULL);
+
+INSERT INTO SUPPLIER (SUPP_NAME, SUPP_CITY,SUPP_PHONE) VALUES("RAJESH RETAILS", "DELHI", 1234567890),
+			("APPARIO LTD.", "MUMBAI", 2589631470),
+			("KNOME PRODUCTS", "BANGLOARE", 9785462315),
+			("BANSAL RETAILS", "KOCHI", 8975463285),
+			("MITTAL LTD.", "LUCKNOW", 7898456532);
+
+INSERT INTO CUSTOMER (CUST_NAME,CUST_PHONE,CUST_CITY,CUST_GENDER) VALUES("AAKASH",9999999999, "DELHI","M"),
+		("AMAN",9785463215, "NOIDA","M"),
+		("NEHA",9999999999, "MUMBAI","F"),
+		("MEGHA",9994562399, "KOLKATA","F"),
+		("PULKIT",7895999999, "LUCKNOW","M");
+
+INSERT INTO CATEGORY(CAT_NAME) VALUES("BOOKS"),
+		("GAMES"),
+		("GROCERIES"),
+		("ELECTRONICS"),
+		("CLOTHES");
+        
+INSERT INTO PRODUCT(PRO_NAME,PRO_DESC,CAT_ID) VALUES
+			("GTA V","Windows 7 & above with i5 processor and 8GB RAM",2),
+			("TSHIRT","SIZE-L with Black,Blue and White variations",5),
+			("ROG LAPTOP","Windows 10 with 15inch screen, i7 processor, 1TB SSD",4),
+			("OATS","Highly Nutritious from Nestle",3),
+			("HARRY POTTER","Best Collection of all time by J. K Rowling",1),
+			("Milk","1L Toned Milk",3),
+			("Boat Earphones","1.5Meter long Dolby Atoms",4),
+			("Jeans","Stretchable Denim Jeans with various sizes and color",5),
+			("Project IGI","comaptible with windows 7 and above",2),
+			("Hoodie","Black GUCCI for 13 yrs and above",5),
+			("Rich Dad Poor Dad","Written by RObert Kiyosaki",1),
+			("Train Your Brain","By Shireen Stephen",1);
+            
+INSERT INTO SUPPLIER_PRICING (PRO_ID,SUPP_ID,SUPP_PRICE) VALUES(2,2,1500),
+			(3,5,30000),
+			(5,1,3000),
+			(2,3,2500),
+			(4,1,1000);
+
+INSERT INTO ORDERS(ORD_AMOUNT,ORD_DATE,CUST_ID,PRICING_ID) VALUES
+		(1500, "2021-10-06",2,1),
+		(1000, "2021-10-12",3,5),
+		(30000, "2021-09-16",5,2),
+		(1500, "2021-10-05",1,1),
+ 		(3000, "2021-08-16",4,3),
+		(1450, "2021-08-18",1,4),
+		(789, "2021-09-01",3,2),
+		(780,"2021-09-07",5,1),
+		(3000, "2021-09-10",5,3),
+		(2500, "2021-09-10",2,4),
+		(1000, "2021-09-15",4,5),
+		(789, "2021-09-16",4,2),
+		(31000, "2021-09-16",1,3),
+		(1000, "2021-09-16",3,5),
+		(3000, "2021-09-16",5,3),
+		(99, "2021-09-17",2,4);
+
+INSERT INTO RATING(ORD_ID,RAT_RATSTARTS) VALUES
+		(1,4),
+		(2,3),
+		(3,1),
+		(4,2),
+		(5,4),
+		(6,3),
+		(7,4),
+		(8,4),
+		(9,3),
+		(10,5),
+		(11,3),
+		(12,4),
+		(13,2),
+		(14,1),
+		(15,1),
+		(16,0);
+
+
+-- Solution3        
+SELECT CUST_GENDER, COUNT(*) AS TotalCustomers
+FROM customer
+INNER JOIN orders ON customer.CUST_ID = orders.CUST_ID
+WHERE ORD_AMOUNT >= 3000
+GROUP BY CUST_GENDER;
+
+
+
+-- Solution4
+SELECT O.ORD_ID, P.PRO_NAME
+FROM orders O
+INNER JOIN product P ON O.PRICING_ID = P.PRO_ID
+WHERE O.CUST_ID = 2;
+
+
+-- Solution5
+SELECT S.SUPP_ID, S.SUPP_NAME
+FROM supplier S
+INNER JOIN supplier_pricing SP ON S.SUPP_ID = SP.SUPP_ID
+GROUP BY S.SUPP_ID, S.SUPP_NAME
+HAVING COUNT(SP.PRO_ID) > 1;
+
+
+-- Solution6
+SELECT C.CAT_ID, C.CAT_NAME, P.PRO_NAME, SP.SUPP_PRICE
+FROM category C
+INNER JOIN product P ON C.CAT_ID = P.CAT_ID
+INNER JOIN supplier_pricing SP ON P.PRO_ID = SP.PRO_ID
+WHERE SP.SUPP_PRICE = (
+    SELECT MIN(SUPP_PRICE)
+    FROM supplier_pricing SP2
+    WHERE SP2.PRO_ID = P.PRO_ID
+)
+ORDER BY C.CAT_ID;
+
+
+-- Solution7
+SELECT P.PRO_ID, P.PRO_NAME
+FROM product P
+INNER JOIN supplier_pricing SP ON P.PRO_ID = SP.PRO_ID
+INNER JOIN orders O ON SP.PRICING_ID = O.PRICING_ID
+WHERE O.ORD_DATE > '2021-10-05';
+
+
+-- Solution8
+SELECT CUST_NAME, CUST_GENDER
+FROM customer
+WHERE CUST_NAME LIKE 'A%' OR CUST_NAME LIKE '%A';
+
+
+-- Solution9
+DELIMITER //
+CREATE PROCEDURE GetSupplierService12()
+BEGIN
+    SELECT supplier.SUPP_ID, supplier.SUPP_NAME, rating.RAT_RATSTARTS,
+        CASE
+            WHEN rating.RAT_RATSTARTS = 5 THEN 'Excellent Service'
+            WHEN rating.RAT_RATSTARTS > 4 THEN 'Good Service'
+            WHEN rating.RAT_RATSTARTS > 2 THEN 'Average Service'
+            ELSE 'Poor Service'
+        END AS Type_of_Service
+    FROM supplier
+    INNER JOIN rating ON supplier.SUPP_ID = rating.RAT_ID;
+END //
+DELIMITER ;
+
+CALL GetSupplierService12();
+
+
+
+
